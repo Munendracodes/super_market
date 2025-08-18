@@ -1,25 +1,30 @@
-# Python
+# Bytecode & caches
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
 .pytest_cache/
+.coverage
+htmlcov/
 
 # Virtual environment
 venv/
 ENV/
 env/
 
-# IDE
+# IDE / Editor
 .vscode/
 .idea/
 
-# Alembic
-alembic/versions/*.py
-
-# Environment files
-.env
+# OS
+.DS_Store
+Thumbs.db
 
 # Logs
 *.log
+
+# Local environment
+.env
+
+# Alembic (optional: if you don’t want migration history in Git)
+alembic/versions/*.py

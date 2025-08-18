@@ -1,0 +1,26 @@
+# ===============================
+# Line Ending Normalization Rules
+# ===============================
+
+# All text files should use LF by default
+* text=auto eol=lf
+
+# Python files → LF
+*.py text eol=lf
+
+# Shell scripts (entrypoint.sh, etc.) → LF
+*.sh text eol=lf
+
+# SQL / YAML / ENV files → LF
+*.sql text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.env text eol=lf
+
+# Windows batch scripts → CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Markdown / Documentation → LF
+*.md text eol=lf
+*.txt text eol=lf
