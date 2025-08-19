@@ -27,4 +27,4 @@ Thumbs.db
 .env
 
 # Alembic (optional: if you don’t want migration history in Git)
-alembic/versions/*.py
+#alembic/versions/*.py
