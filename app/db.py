@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 import redis
 from app.base import Base
 from app.config import settings
+from urllib.parse import quote_plus
 
 # Build DB URL dynamically based on settings
 DATABASE_URL = (
@@ -10,6 +11,10 @@ DATABASE_URL = (
     f"@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DB}"
 )
 
+DATABASE_URL = (
+    f"mysql+pymysql://{settings.MYSQL_USER}:{quote_plus(settings.MYSQL_PASSWORD)}"
+    f"@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DB}"
+)
 # Create SQLAlchemy engine
 engine = create_engine(
     DATABASE_URL,
