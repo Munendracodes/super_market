@@ -31,31 +31,31 @@ class Settings(BaseSettings):
 
 if branch == "main":
     settings = Settings(
-        MYSQL_USER=os.getenv("MAIN_MYSQL_USER"),
-        MYSQL_PASSWORD=os.getenv("MAIN_MYSQL_PASSWORD"),
-        MYSQL_HOST=os.getenv("MAIN_MYSQL_HOST"),
-        MYSQL_PORT=int(os.getenv("MAIN_MYSQL_PORT", 3306)),
-        MYSQL_DB=os.getenv("MAIN_MYSQL_DB"),
-        REDIS_HOST=os.getenv("MAIN_REDIS_HOST", "127.0.0.1"),
-        REDIS_PORT=int(os.getenv("MAIN_REDIS_PORT", 6379)),
+        MYSQL_USER=os.getenv("MAIN_MYSQL_USER"), #type: ignore
+        MYSQL_PASSWORD=os.getenv("MAIN_MYSQL_PASSWORD"), #type: ignore
+        MYSQL_HOST=os.getenv("MAIN_MYSQL_HOST"), #type: ignore
+        MYSQL_PORT=int(os.getenv("MAIN_MYSQL_PORT", 3306)), #type: ignore
+        MYSQL_DB=os.getenv("MAIN_MYSQL_DB"), #type: ignore
+        REDIS_HOST=os.getenv("MAIN_REDIS_HOST", "127.0.0.1"),   
+        REDIS_PORT=int(os.getenv("MAIN_REDIS_PORT", 6379)), #type: ignore
     )
 elif branch == "release":
     settings = Settings(
-        MYSQL_USER=os.getenv("RELEASE_MYSQL_USER"),
-        MYSQL_PASSWORD=os.getenv("RELEASE_MYSQL_PASSWORD"),
-        MYSQL_HOST=os.getenv("RELEASE_MYSQL_HOST"),
-        MYSQL_PORT=int(os.getenv("RELEASE_MYSQL_PORT", 3306)),
-        MYSQL_DB=os.getenv("RELEASE_MYSQL_DB"),
-        REDIS_HOST=os.getenv("RELEASE_REDIS_HOST", "127.0.0.1"),
-        REDIS_PORT=int(os.getenv("RELEASE_REDIS_PORT", 6379)),
+        MYSQL_USER=os.getenv("RELEASE_MYSQL_USER"),     #type: ignore           
+        MYSQL_PASSWORD=os.getenv("RELEASE_MYSQL_PASSWORD"),             #type: ignore
+        MYSQL_HOST=os.getenv("RELEASE_MYSQL_HOST"),   #type: ignore
+        MYSQL_PORT=int(os.getenv("RELEASE_MYSQL_PORT", 3306)), #type: ignore
+        MYSQL_DB=os.getenv("RELEASE_MYSQL_DB"),   #type: ignore
+        REDIS_HOST=os.getenv("RELEASE_REDIS_HOST", "127.0.0.1"), #type: ignore   
+        REDIS_PORT=int(os.getenv("RELEASE_REDIS_PORT", 6379)), #type: ignore
     )
 else:  # dev branch defaults
     settings = Settings(
-        MYSQL_USER=os.getenv("DEV_MYSQL_USER", "root"),
-        MYSQL_PASSWORD=os.getenv("DEV_MYSQL_PASSWORD", "root"),
-        MYSQL_HOST=os.getenv("DEV_MYSQL_HOST", "127.0.0.1"),
-        MYSQL_PORT=int(os.getenv("DEV_MYSQL_PORT", 3306)),
-        MYSQL_DB=os.getenv("DEV_MYSQL_DB", "super_market_dev"),
-        REDIS_HOST=os.getenv("DEV_REDIS_HOST", "127.0.0.1"),
-        REDIS_PORT=int(os.getenv("DEV_REDIS_PORT", 6379)),
+        MYSQL_USER=os.getenv("RELEASE_MYSQL_USER"),     #type: ignore           
+        MYSQL_PASSWORD=os.getenv("RELEASE_MYSQL_PASSWORD"),             #type: ignore
+        MYSQL_HOST=os.getenv("RELEASE_MYSQL_HOST"),   #type: ignore
+        MYSQL_PORT=int(os.getenv("RELEASE_MYSQL_PORT", 3306)), #type: ignore
+        MYSQL_DB=os.getenv("RELEASE_MYSQL_DB"),   #type: ignore
+        REDIS_HOST=os.getenv("RELEASE_REDIS_HOST", "127.0.0.1"), #type: ignore   
+        REDIS_PORT=int(os.getenv("RELEASE_REDIS_PORT", 6379)), #type: ignore
     )

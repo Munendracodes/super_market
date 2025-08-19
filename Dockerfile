@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 # ============================
 FROM base AS builder
 
-COPY requirements.txt .
+COPY requirements.txt . 
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt
 
@@ -33,7 +33,7 @@ FROM base
 
 COPY --from=builder /usr/local /usr/local
 
-# Copy project files
+# Copy project files (excluding .git)
 COPY . .
 
 # Expose FastAPI default port

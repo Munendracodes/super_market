@@ -38,8 +38,11 @@ logger.info(f"🌿 Current Git branch detected: {branch}")
 if branch == "main" and os.getenv("FORCE_MAIN_MIGRATION", "false").lower() != "true":
     logger.error("🚨 Migration blocked! You're on MAIN branch but FORCE_MAIN_MIGRATION is not set.")
     raise SystemExit(
-        "❌ Aborting migration: Running migrations on MAIN requires FORCE_MAIN_MIGRATION=true"
+        "❌ Aborting migration: Running migrations on MAIN requires $env:FORCE_MAIN_MIGRATION='true'"
     )
+
+if branch == "main" and os.getenv("FORCE_MAIN_MIGRATION", "false").lower() == "true":   
+    logger.warning("⚠️ Running migrations on MAIN branch with FORCE_MAIN_MIGRATION enabled. Proceed with caution!")
 
 # Build DB URL from settings
 SQLALCHEMY_DATABASE_URL = (
@@ -52,7 +55,6 @@ logger.info("🔧 Database config:")
 logger.info(f"   👤 User: {settings.MYSQL_USER}")
 logger.info(f"   🏠 Host: {settings.MYSQL_HOST}")
 logger.info(f"   🗄️ DB:   {settings.MYSQL_DB}")
-logger.info(f"   🔗 URL:  {SQLALCHEMY_DATABASE_URL}")
 
 # Target metadata (all models)
 target_metadata = Base.metadata
