@@ -5,6 +5,7 @@ import subprocess
 import logging
 from sqlalchemy import create_engine, text
 from alembic import context
+from urllib.parse import quote_plus
 
 # Ensure project root is in path
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -46,10 +47,11 @@ if branch == "main" and os.getenv("FORCE_MAIN_MIGRATION", "false").lower() == "t
 
 # Build DB URL from settings
 SQLALCHEMY_DATABASE_URL = (
-    f"mysql+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}"
+    f"mysql+pymysql://{settings.MYSQL_USER}:{quote_plus(settings.MYSQL_PASSWORD)}"
     f"@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DB}"
 )
-config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
+config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL.replace("%", "%%"))
+logger.info(f"🔗 SQLAlchemy URL: {SQLALCHEMY_DATABASE_URL}")
 
 logger.info("🔧 Database config:")
 logger.info(f"   👤 User: {settings.MYSQL_USER}")
