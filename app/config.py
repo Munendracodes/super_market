@@ -37,7 +37,7 @@ if branch == "main":
         MYSQL_PORT=int(os.getenv("MAIN_MYSQL_PORT", 3306)), #type: ignore
         MYSQL_DB=os.getenv("MAIN_MYSQL_DB"), #type: ignore
         REDIS_HOST=os.getenv("MAIN_REDIS_HOST", "127.0.0.1"),   
-        REDIS_PORT=int(os.getenv("MAIN_REDIS_PORT", 6379)), #type: ignore
+        REDIS_PORT=int(os.getenv("MAIN_REDIS_PORT", 6380)), #type: ignore
     )
 elif branch == "release":
     settings = Settings(

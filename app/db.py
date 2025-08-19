@@ -25,9 +25,10 @@ SessionLocal = sessionmaker(
 )
 
 # Redis client (optional, depends on branch-aware config too)
-redis_client = redis.Redis(
+redis_client = redis.StrictRedis(
     host=settings.REDIS_HOST,
     port=settings.REDIS_PORT,
+    db=0,
     decode_responses=True
 )
 

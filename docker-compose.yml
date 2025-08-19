@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  # ============================
+  # FastAPI Application
+  # ============================
+  app:
+    build: .
+    container_name: fastapi_app
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - redis_main
+      - redis_release
+    command: ["/app/entrypoint.sh"]
+
+  # ============================
+  # Redis - Release branch
+  # ============================
+  redis_release:
+    image: redis:7-alpine
+    container_name: redis_release
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # ============================
+  # Redis - Main branch
+  # ============================
+  redis_main:
+    image: redis:7-alpine
+    container_name: redis_main
+    restart: always
+    ports:
+      - "6380:6379"
