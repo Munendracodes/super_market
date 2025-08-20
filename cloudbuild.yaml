@@ -1,0 +1,35 @@
+logsBucket: gs://super-market-cloudbuild-logs
+
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build', '-t',
+        'asia-south1-docker.pkg.dev/YOUR_PROJECT_ID/super-market-repo/super_market:latest',
+        '.'
+      ]
+
+  # Step 2: Push image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'push',
+        'asia-south1-docker.pkg.dev/YOUR_PROJECT_ID/super-market-repo/super_market:latest'
+      ]
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      [
+        'run', 'deploy', 'super-market-api',
+        '--image=asia-south1-docker.pkg.dev/YOUR_PROJECT_ID/super-market-repo/super_market:latest',
+        '--region=asia-south1',
+        '--platform=managed',
+        '--allow-unauthenticated',
+        '--port=8000'
+      ]
+
+images:
+  - asia-south1-docker.pkg.dev/YOUR_PROJECT_ID/super-market-repo/super_market:latest

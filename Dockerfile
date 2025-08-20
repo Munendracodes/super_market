@@ -1,7 +1,5 @@
-# ============================
-# Stage 1: Base Image
-# ============================
-FROM python:3.11-slim AS base
+# Use official Python slim image
+FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
@@ -10,36 +8,25 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies (needed for MySQL client + Alembic)
+# Install system dependencies (MySQL client, gcc, etc.)
 RUN apt-get update && apt-get install -y \
     gcc \
     default-libmysqlclient-dev \
     build-essential \
+    curl \
+    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
-# ============================
-# Stage 2: Install dependencies
-# ============================
-FROM base AS builder
-
-COPY requirements.txt . 
+# Copy dependencies and install
+COPY requirements.txt .
 RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+    && pip install --no-cache-dir -r requirements.txt
 
-# ============================
-# Stage 3: Final image
-# ============================
-FROM base
-
-COPY --from=builder /usr/local /usr/local
-
-# Copy project files (excluding .git)
+# Copy project files
 COPY . .
 
-# Expose FastAPI default port
-EXPOSE 8000
+# Add root to PYTHONPATH
+ENV PYTHONPATH=/app
 
-# Entrypoint script (to handle migrations + app start)
-RUN chmod +x /app/entrypoint.sh
-
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Use PORT env variable for Cloud Run compatibility
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

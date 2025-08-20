@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-# echo "🚀 Running Alembic migrations..."
-# alembic upgrade head
-
+# Start FastAPI
 echo "✅ Starting FastAPI with Uvicorn..."
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+exec uvicorn app.main:app --host 0.0.0.0 --port 8000
