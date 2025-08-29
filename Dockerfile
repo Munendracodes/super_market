@@ -1,32 +1,28 @@
 # Use official Python slim image
 FROM python:3.11-slim
 
-# Set working directory
 WORKDIR /app
 
-# Prevent Python from writing .pyc files & enable logs
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
 
-# Install system dependencies (MySQL client, gcc, etc.)
-RUN apt-get update && apt-get install -y \
+# System deps (gcc for some wheels; mysql client libs optional if you use mysqlclient)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    default-libmysqlclient-dev \
     build-essential \
+    default-libmysqlclient-dev \
     curl \
     netcat-openbsd \
-    && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*
 
-# Copy dependencies and install
+# Install deps
 COPY requirements.txt .
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
+# Copy project
 COPY . .
 
-# Add root to PYTHONPATH
-ENV PYTHONPATH=/app
-
-# Use PORT env variable for Cloud Run compatibility
+# Cloud Run exposes $PORT; default to 8000 locally
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

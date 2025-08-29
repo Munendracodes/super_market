@@ -1,3 +1,4 @@
+# alembic/env.py
 from logging.config import fileConfig
 import os
 import sys
@@ -5,25 +6,26 @@ import subprocess
 import logging
 from sqlalchemy import create_engine, text
 from alembic import context
-from urllib.parse import quote_plus
+from dotenv import load_dotenv  # ✅ ensures .env is loaded
 
-# Ensure project root is in path
+# Load environment variables from .env
+load_dotenv()
+
+# Ensure app modules are available
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-# Import branch-aware settings
 from app.base import Base
-import app.models  # make sure all models are imported
-from app.config import settings  # 👈 branch-aware config
+import app.models  # noqa: F401
+from app.config import settings
 
-# Alembic Config object
+# Alembic Config
 config = context.config
 
-# Logging setup
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 logger = logging.getLogger("alembic.env")
 
-# Detect Git branch
+
 def get_git_branch() -> str:
     try:
         return subprocess.check_output(
@@ -32,40 +34,33 @@ def get_git_branch() -> str:
     except Exception:
         return "dev"
 
-branch = get_git_branch()
-logger.info(f"🌿 Current Git branch detected: {branch}")
 
-# 🚨 Safety check: prevent accidental migrations on main
+branch = get_git_branch()
+logger.info(f"🌿 Current Git branch: {branch}")
+
 if branch == "main" and os.getenv("FORCE_MAIN_MIGRATION", "false").lower() != "true":
-    logger.error("🚨 Migration blocked! You're on MAIN branch but FORCE_MAIN_MIGRATION is not set.")
     raise SystemExit(
-        "❌ Aborting migration: Running migrations on MAIN requires $env:FORCE_MAIN_MIGRATION='true'"
+        "❌ Aborting migration: On MAIN branch. Set FORCE_MAIN_MIGRATION=true to override."
     )
 
-if branch == "main" and os.getenv("FORCE_MAIN_MIGRATION", "false").lower() == "true":   
-    logger.warning("⚠️ Running migrations on MAIN branch with FORCE_MAIN_MIGRATION enabled. Proceed with caution!")
+# ✅ Safe env loading with defaults
+MYSQL_USER = os.getenv("MYSQL_USER", "root")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
+MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
+MYSQL_PORT = int(os.getenv("MYSQL_PORT", 3306))  # cast to int
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "testdb")
 
-# Build DB URL from settings
 SQLALCHEMY_DATABASE_URL = (
-    f"mysql+pymysql://{settings.MYSQL_USER}:{quote_plus(settings.MYSQL_PASSWORD)}"
-    f"@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DB}"
+    f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}"
+    f"@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 )
+
 config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL.replace("%", "%%"))
-logger.info(f"🔗 SQLAlchemy URL: {SQLALCHEMY_DATABASE_URL}")
 
-logger.info("🔧 Database config:")
-logger.info(f"   👤 User: {settings.MYSQL_USER}")
-logger.info(f"   🏠 Host: {settings.MYSQL_HOST}")
-logger.info(f"   🗄️ DB:   {settings.MYSQL_DB}")
-
-# Target metadata (all models)
 target_metadata = Base.metadata
-logger.info(f"🧩 Loaded models: {list(Base.metadata.tables.keys())}")
 
-# ----------------- Migration functions -----------------
+
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode."""
-    logger.info("📴 Running migrations in OFFLINE mode...")
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -73,26 +68,20 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
-
     with context.begin_transaction():
-        logger.info("⚡ Starting transaction (offline)...")
         context.run_migrations()
-        logger.info("✅ Offline migrations completed")
+
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode."""
-    logger.info("🌐 Running migrations in ONLINE mode...")
     connectable = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
 
     with connectable.connect() as connection:
-        logger.info("🔌 Connected to database")
-
         def process_revision_directives(context, revision, directives):
             if getattr(config.cmd_opts, "autogenerate", False):
                 script = directives[0]
                 if script.upgrade_ops.is_empty():
                     directives[:] = []
-                    logger.info("😴 No schema changes detected (online). Database is up-to-date.")
+                    logger.info("😴 No schema changes detected — migration skipped.")
 
         context.configure(
             connection=connection,
@@ -101,16 +90,13 @@ def run_migrations_online() -> None:
         )
 
         with context.begin_transaction():
-            logger.info("⚡ Starting transaction (online)...")
             context.run_migrations()
-            logger.info("✅ Online migrations completed (if any changes)")
 
-        # Debug: Show tables
         result = connection.execute(text("SHOW TABLES;"))
         tables = [row[0] for row in result]
         logger.info(f"📊 Current tables in DB: {tables}")
 
-# ----------------- Entrypoint -----------------
+
 if context.is_offline_mode():
     run_migrations_offline()
 else:

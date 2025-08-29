@@ -1,2 +1,2 @@
-# app/models/__init__.py
-from .user import User
+# Ensure Alembic can discover models
+from .user import User  # noqa: F401

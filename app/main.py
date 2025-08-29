@@ -1,15 +1,19 @@
-from fastapi import FastAPI
-from app.db import Base, engine
-from app.routers import user
-from app.routers.redis import router as redis_router
+from fastapi import FastAPI, status
+from fastapi.responses import JSONResponse
+from app.db import check_mysql, check_redis
 
-# Dev convenience only (prod uses Alembic)
-Base.metadata.create_all(bind=engine)
-
-app = FastAPI(title="Super Market API")
-app.include_router(user.router)
-app.include_router(redis_router)
+app = FastAPI()
 
 @app.get("/health")
-def health():
-    return {"status": "ok"}
+def health_check():
+    mysql_status = check_mysql()
+    redis_status = check_redis()
+    healthy = mysql_status.startswith("ok") and redis_status == "ok"
+    status_code = status.HTTP_200_OK if healthy else status.HTTP_503_SERVICE_UNAVAILABLE
+    return JSONResponse(
+        status_code=status_code,
+        content={
+            "mysql": mysql_status,
+            "redis": redis_status
+        },
+    )
