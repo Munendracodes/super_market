@@ -1,11 +1,11 @@
 logsBucket: gs://super-market-cloudbuild-logs
 
 steps:
-  # Build
+  # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'asia-south1-docker.pkg.dev/$PROJECT_ID/super-market-repo/super_market:latest', '.']
 
-  # Push
+  # Push the image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'asia-south1-docker.pkg.dev/$PROJECT_ID/super-market-repo/super_market:latest']
 
@@ -19,7 +19,8 @@ steps:
         '--region=asia-south1',
         '--platform=managed',
         '--allow-unauthenticated',
-        '--port=8000'
+        '--port=8000',
+        '--set-env-vars=MYSQL_HOST=$MYSQL_HOST,MYSQL_PORT=$MYSQL_PORT,MYSQL_USER=$MYSQL_USER,MYSQL_PASSWORD=$MYSQL_PASSWORD,MYSQL_DATABASE=$MYSQL_DATABASE,REDIS_HOST=$REDIS_HOST,REDIS_PORT=$REDIS_PORT'
       ]
 
 images:

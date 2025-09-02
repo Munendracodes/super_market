@@ -13,7 +13,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    command: ["/app/entrypoint.sh"]   # 👈 use entrypoint
+    volumes:
+      - .:/app                        # 👈 ensure alembic + code visible
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
       interval: 30s
@@ -27,7 +29,7 @@ services:
     env_file:
       - .env
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword   # internal only, not used by app
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}

@@ -1,6 +1,9 @@
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from app.db import check_mysql, check_redis
+from app.routers.user import router as user_router
+from app.routers.redis import router as redis_router
+from app.routers.authentication import router as authentication_router
 
 app = FastAPI()
 
@@ -17,3 +20,8 @@ def health_check():
             "redis": redis_status
         },
     )
+
+# ✅ Correct way to include routers
+app.include_router(authentication_router)
+app.include_router(user_router)
+app.include_router(redis_router)

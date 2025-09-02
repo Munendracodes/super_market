@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app
 
-# System deps (gcc for some wheels; mysql client libs optional if you use mysqlclient)
+# System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     build-essential \
@@ -24,5 +24,9 @@ RUN pip install --upgrade pip && \
 # Copy project
 COPY . .
 
-# Cloud Run exposes $PORT; default to 8000 locally
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Copy and set entrypoint
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Default command
+CMD ["/app/entrypoint.sh"]
